@@ -10,5 +10,5 @@ tmp
 *.log
 
 # Exclude alternate dockerfiles from build context
-dockerfile.onboard-smoke
-docker/openclaw-smoke/Dockerfile
+dockerfile.onboard-smoke.example
+docker/openclaw-smoke/Dockerfile.example

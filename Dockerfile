@@ -1,16 +1,9 @@
-# Debian base only: no node base image (avoids banned Dockerfile keywords on Railway)
-FROM debian:bookworm-slim AS base
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates curl git gnupg \
-  && mkdir -p /etc/apt/keyrings \
-  && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-  && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends nodejs \
+# Alpine base: official image has no VOLUME (Railway bans VOLUME in any layer)
+FROM alpine:3.19 AS base
+RUN apk add --no-cache nodejs npm corepack ca-certificates curl git \
   && corepack enable \
-  && groupadd --gid 1000 node \
-  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node \
-  && rm -rf /var/lib/apt/lists/*
+  && addgroup -g 1000 node \
+  && adduser -u 1000 -G node -s /bin/sh -D node
 
 FROM base AS deps
 WORKDIR /app
@@ -29,14 +22,15 @@ COPY packages/adapters/openclaw-gateway/package.json packages/adapters/openclaw-
 COPY packages/adapters/opencode-local/package.json packages/adapters/opencode-local/
 COPY packages/adapters/pi-local/package.json packages/adapters/pi-local/
 
-RUN pnpm install --frozen-lockfile
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 FROM base AS build
 WORKDIR /app
 COPY --from=deps /app /app
 COPY . .
-RUN pnpm --filter @paperclipai/ui build
-RUN pnpm --filter @paperclipai/server build
+RUN corepack enable pnpm \
+  && pnpm --filter @paperclipai/ui build \
+  && pnpm --filter @paperclipai/server build
 RUN test -f server/dist/index.js || (echo "ERROR: server build output missing" && exit 1)
 
 FROM base AS production
