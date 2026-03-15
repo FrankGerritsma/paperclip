@@ -1,4 +1,4 @@
-# Alpine base: official image has no VOLUME (Railway bans VOLUME in any layer)
+# Alpine base: no inherited mounts (Railway-compatible)
 FROM alpine:3.19 AS base
 RUN apk add --no-cache nodejs npm corepack ca-certificates curl git \
   && corepack enable \
