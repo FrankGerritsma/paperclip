@@ -132,10 +132,33 @@ export function loadConfig(): Config {
       ? (authBaseUrlModeFromEnvRaw as AuthBaseUrlMode)
       : null;
   const publicUrlFromEnv = process.env.PAPERCLIP_PUBLIC_URL;
+  const railwayStaticRaw = process.env.RAILWAY_STATIC_URL?.trim();
+  let railwayStaticUrl: string | undefined;
+  if (railwayStaticRaw) {
+    if (railwayStaticRaw.includes("://")) {
+      try {
+        railwayStaticUrl = new URL(railwayStaticRaw).origin;
+      } catch {
+        railwayStaticUrl = `https://${railwayStaticRaw}`;
+      }
+    } else {
+      railwayStaticUrl = `https://${railwayStaticRaw}`;
+    }
+  }
+  const railwayStaticHostname = railwayStaticUrl
+    ? (() => {
+      try {
+        return new URL(railwayStaticUrl).hostname.trim().toLowerCase();
+      } catch {
+        return null;
+      }
+    })()
+    : null;
   const authPublicBaseUrlRaw =
     process.env.PAPERCLIP_AUTH_PUBLIC_BASE_URL ??
     process.env.BETTER_AUTH_URL ??
     process.env.BETTER_AUTH_BASE_URL ??
+    railwayStaticUrl ??
     publicUrlFromEnv ??
     fileConfig?.auth?.publicBaseUrl;
   const authPublicBaseUrl = authPublicBaseUrlRaw?.trim() || undefined;
@@ -169,6 +192,7 @@ export function loadConfig(): Config {
       [
         ...(allowedHostnamesFromEnv ?? fileConfig?.server.allowedHostnames ?? []),
         ...(publicUrlHostname ? [publicUrlHostname] : []),
+        ...(railwayStaticHostname ? [railwayStaticHostname] : []),
       ]
         .map((value) => value.trim().toLowerCase())
         .filter(Boolean),

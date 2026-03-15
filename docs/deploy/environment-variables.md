@@ -48,3 +48,16 @@ These are set automatically by the server when invoking agents:
 |----------|-------------|
 | `ANTHROPIC_API_KEY` | Anthropic API key (for Claude Local adapter) |
 | `OPENAI_API_KEY` | OpenAI API key (for Codex Local adapter) |
+
+## Authenticated mode (Better Auth)
+
+| Variable | Description |
+|----------|-------------|
+| `PAPERCLIP_PUBLIC_URL` | Public URL of the app (used for auth redirects and trusted-origin derivation). |
+| `PAPERCLIP_AUTH_PUBLIC_BASE_URL` | Override auth base URL (defaults from `PAPERCLIP_PUBLIC_URL` or, on Railway, from `RAILWAY_STATIC_URL`). |
+| `RAILWAY_STATIC_URL` | (Railway) Custom domain hostname, e.g. `agents.example.com`. When set, it is added to allowed hostnames and used as the auth base URL so login works at the custom domain. |
+| `PAPERCLIP_ALLOWED_HOSTNAMES` | Comma-separated hostnames allowed for auth (trusted origins). |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | Comma-separated full origins, e.g. `https://agents.example.com`. Merged with derived origins. |
+| `PAPERCLIP_AUTH_DISABLE_SIGN_UP` | Set to `true` to disable self-service sign-up (use bootstrap invite for first user). |
+
+**First user:** Sign up at the app URL, or run `paperclipai auth bootstrap-ceo` and open the printed invite URL to create the first admin.
