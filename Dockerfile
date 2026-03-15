@@ -1,4 +1,4 @@
-# Debian base only: no Node base image (official node images can trigger Railway VOLUME ban)
+# Debian base only: no node base image (avoids banned Dockerfile keywords on Railway)
 FROM debian:bookworm-slim AS base
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates curl git gnupg \
