@@ -1,6 +1,7 @@
 # Alpine base: no inherited mounts (Railway-compatible)
 FROM alpine:3.19 AS base
 RUN apk add --no-cache nodejs npm ca-certificates curl git \
+  && npm install -g corepack \
   && corepack enable \
   && addgroup -g 1000 node \
   && adduser -u 1000 -G node -s /bin/sh -D node
