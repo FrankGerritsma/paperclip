@@ -1,0 +1,5 @@
+# Force Railway to use the root Dockerfile only (no VOLUME).
+# See https://docs.railway.app/reference/dockerfiles
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
