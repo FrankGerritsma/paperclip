@@ -202,11 +202,12 @@ auto_bootstrap_authenticated_smoke() {
   echo "    Smoke admin credentials: $SMOKE_ADMIN_EMAIL / $SMOKE_ADMIN_PASSWORD"
 }
 
+# Onboard-smoke Dockerfile was removed for Railway (VOLUME ban). Smoke uses main Dockerfile.
 echo "==> Building onboard smoke image"
 docker build \
   --build-arg PAPERCLIPAI_VERSION="$PAPERCLIPAI_VERSION" \
   --build-arg HOST_UID="$HOST_UID" \
-  -f "$REPO_ROOT/dockerfile.onboard-smoke.example" \
+  -f "$REPO_ROOT/Dockerfile" \
   -t "$IMAGE_NAME" \
   "$REPO_ROOT"
 
