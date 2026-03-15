@@ -1,9 +1,16 @@
-# Use bookworm-slim (no VOLUME in upstream); lts-trixie-slim can trigger Railway's VOLUME ban
-FROM node:22-bookworm-slim AS base
+# Debian base only: no Node base image (official node images can trigger Railway VOLUME ban)
+FROM debian:bookworm-slim AS base
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates curl git \
+  && apt-get install -y --no-install-recommends ca-certificates curl git gnupg \
+  && mkdir -p /etc/apt/keyrings \
+  && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+  && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends nodejs \
+  && corepack enable \
+  && groupadd --gid 1000 node \
+  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node \
   && rm -rf /var/lib/apt/lists/*
-RUN corepack enable
 
 FROM base AS deps
 WORKDIR /app

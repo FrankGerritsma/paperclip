@@ -9,6 +9,6 @@ data
 tmp
 *.log
 
-# Exclude alternate Dockerfiles so Railway does not scan them for banned keywords (e.g. VOLUME)
-Dockerfile.onboard-smoke
+# Exclude alternate dockerfiles so Railway does not scan them for banned keywords (e.g. VOLUME)
+dockerfile.onboard-smoke
 docker/openclaw-smoke/Dockerfile
