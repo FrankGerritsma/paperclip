@@ -1520,13 +1520,12 @@ export function agentRoutes(db: Db) {
     const afterSeq = Number(req.query.afterSeq ?? 0);
     const limit = Number(req.query.limit ?? 200);
     const events = await heartbeat.listEvents(runId, Number.isFinite(afterSeq) ? afterSeq : 0, Number.isFinite(limit) ? limit : 200);
-    const redactedEvents = events.map((event) =>
-      redactCurrentUserValue({
-        ...event,
-        payload: redactEventPayload(event.payload),
-      }),
-    );
-    res.json(redactedEvents);
+    const isRunOwner = req.actor.type === "agent" && req.actor.agentId === run.agentId;
+    const eventsPayload = events.map((event) => ({
+      ...event,
+      payload: redactEventPayload(event.payload),
+    }));
+    res.json(isRunOwner ? eventsPayload : eventsPayload.map((e) => redactCurrentUserValue(e)));
   });
 
   router.get("/heartbeat-runs/:runId/log", async (req, res) => {

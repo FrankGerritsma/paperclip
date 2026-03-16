@@ -1087,6 +1087,8 @@ export function heartbeatService(db: Db) {
     const sanitizedMessage = event.message ? redactCurrentUserText(event.message) : event.message;
     const sanitizedPayload = event.payload ? redactCurrentUserValue(event.payload) : event.payload;
 
+    // Store raw payload so the run's agent can get real paths from GET .../events (for file resolution).
+    // Live event publish stays redacted so board/SSE does not leak paths.
     await db.insert(heartbeatRunEvents).values({
       companyId: run.companyId,
       runId: run.id,
@@ -1097,7 +1099,7 @@ export function heartbeatService(db: Db) {
       level: event.level,
       color: event.color,
       message: sanitizedMessage,
-      payload: sanitizedPayload,
+      payload: event.payload ?? null,
     });
 
     publishLiveEvent({
