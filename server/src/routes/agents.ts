@@ -1482,7 +1482,10 @@ export function agentRoutes(db: Db) {
       return;
     }
     assertCompanyAccess(req, run.companyId);
-    res.json(redactCurrentUserValue(run));
+    // Return unredacted run for the run's agent so it gets real paths (e.g. paperclipWorkspace.cwd)
+    // and can resolve files like MEMORY.md. Board/users still get redacted to avoid leaking usernames.
+    const isRunOwner = req.actor.type === "agent" && req.actor.agentId === run.agentId;
+    res.json(isRunOwner ? run : redactCurrentUserValue(run));
   });
 
   router.post("/heartbeat-runs/:runId/cancel", async (req, res) => {
@@ -1618,8 +1621,10 @@ export function agentRoutes(db: Db) {
       return;
     }
 
+    const isRunOwner = req.actor.type === "agent" && req.actor.agentId === run.agentId;
+    const runPayload = isRunOwner ? run : redactCurrentUserValue(run);
     res.json({
-      ...redactCurrentUserValue(run),
+      ...runPayload,
       agentId: agent.id,
       agentName: agent.name,
       adapterType: agent.adapterType,
