@@ -18,6 +18,7 @@ import {
   ensureCommandResolvable,
   ensurePathInEnv,
   renderTemplate,
+  readPaperclipCurrentTaskMarkdown,
   runChildProcess,
 } from "@paperclipai/adapter-utils/server-utils";
 import {
@@ -383,6 +384,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
   const prompt = joinPromptSections([
     renderedBootstrapPrompt,
     sessionHandoffNote,
+    readPaperclipCurrentTaskMarkdown(context),
     renderedPrompt,
   ]);
   const promptMetrics = {

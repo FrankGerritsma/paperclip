@@ -1,0 +1,22 @@
+{
+  "$meta": {
+    "version": 1,
+    "updatedAt": "2026-03-16T00:00:00.000Z",
+    "source": "configure"
+  },
+  "database": {
+    "mode": "postgres"
+  },
+  "logging": {
+    "mode": "file",
+    "logDir": "~/.paperclip/instances/default/logs"
+  },
+  "server": {
+    "deploymentMode": "authenticated",
+    "exposure": "public"
+  },
+  "auth": {
+    "baseUrlMode": "explicit",
+    "publicBaseUrl": "https://agents.frankschrijft.nl"
+  }
+}

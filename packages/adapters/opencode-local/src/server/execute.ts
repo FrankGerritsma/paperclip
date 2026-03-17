@@ -15,6 +15,7 @@ import {
   ensureCommandResolvable,
   ensurePathInEnv,
   renderTemplate,
+  readPaperclipCurrentTaskMarkdown,
   runChildProcess,
 } from "@paperclipai/adapter-utils/server-utils";
 import { isOpenCodeUnknownSessionError, parseOpenCodeJsonl } from "./parse.js";
@@ -254,6 +255,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     instructionsPrefix,
     renderedBootstrapPrompt,
     sessionHandoffNote,
+    readPaperclipCurrentTaskMarkdown(context),
     renderedPrompt,
   ]);
   const promptMetrics = {

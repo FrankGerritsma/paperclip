@@ -262,6 +262,14 @@ export {
 } from "./project-mentions.js";
 
 export {
+  PAPERCLIP_CURRENT_TASK_MARKDOWN_KEY,
+  PAPERCLIP_CURRENT_TASK_DESCRIPTION_MAX_CHARS,
+  isHeartbeatTimerWake,
+  shouldInjectPaperclipCurrentTaskMarkdown,
+  buildPaperclipCurrentTaskMarkdown,
+} from "./task-wake-prompt.js";
+
+export {
   paperclipConfigSchema,
   configMetaSchema,
   llmConfigSchema,

@@ -18,6 +18,7 @@ import {
   listPaperclipSkillEntries,
   removeMaintainerOnlySkillSymlinks,
   renderTemplate,
+  readPaperclipCurrentTaskMarkdown,
   runChildProcess,
 } from "@paperclipai/adapter-utils/server-utils";
 import { isPiUnknownSessionError, parsePiJsonl } from "./parse.js";
@@ -282,6 +283,10 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     context,
   };
   const renderedSystemPromptExtension = renderTemplate(systemPromptExtension, templateData);
+  const currentTaskMarkdown = readPaperclipCurrentTaskMarkdown(context);
+  const systemPromptForPi = currentTaskMarkdown
+    ? joinPromptSections([currentTaskMarkdown, renderedSystemPromptExtension])
+    : renderedSystemPromptExtension;
   const renderedHeartbeatPrompt = renderTemplate(promptTemplate, templateData);
   const renderedBootstrapPrompt =
     !canResumeSession && bootstrapPromptTemplate.trim().length > 0
@@ -294,7 +299,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     renderedHeartbeatPrompt,
   ]);
   const promptMetrics = {
-    systemPromptChars: renderedSystemPromptExtension.length,
+    systemPromptChars: systemPromptForPi.length,
     promptChars: userPrompt.length,
     bootstrapPromptChars: renderedBootstrapPrompt.length,
     sessionHandoffChars: sessionHandoffNote.length,
@@ -321,7 +326,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     args.push("--mode", "rpc");
     
     // Use --append-system-prompt to extend Pi's default system prompt
-    args.push("--append-system-prompt", renderedSystemPromptExtension);
+    args.push("--append-system-prompt", systemPromptForPi);
     
     if (provider) args.push("--provider", provider);
     if (modelId) args.push("--model", modelId);

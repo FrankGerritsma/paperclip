@@ -40,6 +40,11 @@ import {
   resolveExecutionWorkspaceMode,
 } from "./execution-workspace-policy.js";
 import { redactCurrentUserText, redactCurrentUserValue } from "../log-redaction.js";
+import {
+  PAPERCLIP_CURRENT_TASK_MARKDOWN_KEY,
+  buildPaperclipCurrentTaskMarkdown,
+  shouldInjectPaperclipCurrentTaskMarkdown,
+} from "@paperclipai/shared";
 
 const MAX_LIVE_LOG_CHUNK_BYTES = 8 * 1024;
 const HEARTBEAT_MAX_CONCURRENT_RUNS_DEFAULT = 1;
@@ -1465,17 +1470,34 @@ export function heartbeatService(db: Db) {
       agent.companyId,
       mergedConfig,
     );
-    const issueRef = issueId
+    const issueRow = issueId
       ? await db
           .select({
             id: issues.id,
             identifier: issues.identifier,
             title: issues.title,
+            description: issues.description,
           })
           .from(issues)
           .where(and(eq(issues.id, issueId), eq(issues.companyId, agent.companyId)))
           .then((rows) => rows[0] ?? null)
       : null;
+    const issueRef = issueRow
+      ? { id: issueRow.id, identifier: issueRow.identifier, title: issueRow.title }
+      : null;
+    const wakeReasonForTask = readNonEmptyString(context.wakeReason) ?? undefined;
+    if (
+      issueRow &&
+      shouldInjectPaperclipCurrentTaskMarkdown(issueId, run.invocationSource, wakeReasonForTask)
+    ) {
+      context[PAPERCLIP_CURRENT_TASK_MARKDOWN_KEY] = buildPaperclipCurrentTaskMarkdown({
+        identifier: issueRow.identifier,
+        title: issueRow.title,
+        description: issueRow.description,
+      });
+    } else {
+      delete context[PAPERCLIP_CURRENT_TASK_MARKDOWN_KEY];
+    }
     const executionWorkspace = await realizeExecutionWorkspace({
       base: {
         baseCwd: resolvedWorkspace.cwd,

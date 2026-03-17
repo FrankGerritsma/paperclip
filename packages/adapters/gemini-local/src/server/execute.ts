@@ -20,6 +20,7 @@ import {
   parseObject,
   redactEnvForLogs,
   renderTemplate,
+  readPaperclipCurrentTaskMarkdown,
   runChildProcess,
 } from "@paperclipai/adapter-utils/server-utils";
 import { DEFAULT_GEMINI_LOCAL_MODEL } from "../index.js";
@@ -291,6 +292,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     instructionsPrefix,
     renderedBootstrapPrompt,
     sessionHandoffNote,
+    readPaperclipCurrentTaskMarkdown(context),
     paperclipEnvNote,
     apiAccessNote,
     renderedPrompt,

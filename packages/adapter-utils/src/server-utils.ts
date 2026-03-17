@@ -1,3 +1,4 @@
+import { PAPERCLIP_CURRENT_TASK_MARKDOWN_KEY } from "@paperclipai/shared";
 import { spawn, type ChildProcess } from "node:child_process";
 import { constants as fsConstants, promises as fs } from "node:fs";
 import path from "node:path";
@@ -120,6 +121,14 @@ export function joinPromptSections(
     .map((value) => (typeof value === "string" ? value.trim() : ""))
     .filter(Boolean)
     .join(separator);
+}
+
+/** Non-timer issue wakes set this on context (see heartbeat executeRun). */
+export function readPaperclipCurrentTaskMarkdown(
+  context: Record<string, unknown>,
+): string | undefined {
+  const v = context[PAPERCLIP_CURRENT_TASK_MARKDOWN_KEY];
+  return typeof v === "string" && v.trim().length > 0 ? v.trim() : undefined;
 }
 
 export function redactEnvForLogs(env: Record<string, string>): Record<string, string> {

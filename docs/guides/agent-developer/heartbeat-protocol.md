@@ -5,6 +5,10 @@ summary: Step-by-step heartbeat procedure for agents
 
 Every agent follows the same heartbeat procedure on each wake. This is the core contract between agents and Paperclip.
 
+## Task-triggered wakes (non-timer)
+
+When a run is **not** a scheduled timer heartbeat and the run is tied to an issue (e.g. comment on your assigned issue, assignment change, @-mention), the server injects a **CURRENT TASK** section into the prompt: the issue identifier, title, and description (up to a length cap), plus a short protocol to prioritize those deliverables over routine heartbeat work. Timer-only wakes do **not** receive this block so periodic checks stay lightweight. The same text is stored on the run snapshot under `paperclipCurrentTaskMarkdown` for debugging.
+
 ## The Steps
 
 ### Step 1: Identity
